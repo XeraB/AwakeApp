@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">AppLight</string>
+    <string name="app_name">Awake</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+
+    <string name="night_light">Nachtlicht</string>
+
+    <string name="timer_time">Uhrzeit</string>
+    <string name="timer_duration">Zeitspanne</string>
+    <string name="timer_volume">Lautstärke</string>
+    <!-- Strings used for Chips -->
+    <string name="weekday_mo">Mo</string>
+    <string name="weekday_di">Do</string>
+    <string name="weekday_mi">Mi</string>
+    <string name="weekday_do">Do</string>
+    <string name="weekday_fr">Fr</string>
+    <string name="weekday_sa">Sa</string>
+    <string name="weekday_so">So</string>
 </resources>
