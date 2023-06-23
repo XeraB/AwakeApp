@@ -1,5 +1,6 @@
 package de.xera.applight;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +20,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.Arrays;
 
 public class DeviceScanActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
     private static final long SCAN_PERIOD = 10000;
+    String[] permissions;
 
     private Button searchDevices;
 
@@ -35,17 +40,27 @@ public class DeviceScanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_scan);
+        permissions = new String[]{Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        Log.d("OnCreate()", "Permissions check:");
+        if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("OnCreate()", "Permissions missing BLUETOOTH_CONNECT");
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("OnCreate()", "Permissions missing BLUETOOTH_SCAN");
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("OnCreate()", "Permissions missing ACCESS_COARSE_LOCATION");
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("OnCreate()", "Permissions missing ACCESS_FINE_LOCATION");
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else {
+            Log.d("Permissions", "Permissions granted.");
+        }
 
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(DeviceScanActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 100);
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(DeviceScanActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 101);
-        }
 
         searchDevices = (Button) findViewById(R.id.searchDevicesButton);
 
@@ -53,7 +68,7 @@ public class DeviceScanActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!bluetoothAdapter.isEnabled()) {
-                    //show Message
+                    Toast.makeText(DeviceScanActivity.this, "Bluetooth ist deaktiviert", Toast.LENGTH_SHORT).show();
                 } else {
                     scanLeDevice();
                 }
@@ -65,6 +80,12 @@ public class DeviceScanActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(llm);
         adapter = new LeDeviceListAdapter(this);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("Permissions", "Permissions: " + Arrays.toString(grantResults));
     }
 
     private boolean scanning = false;
