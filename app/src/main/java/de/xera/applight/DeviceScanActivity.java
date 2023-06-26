@@ -15,6 +15,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
+    private LocationManager locationManager;
     private static final long SCAN_PERIOD = 10000;
     String[] permissions;
 
@@ -61,6 +63,7 @@ public class DeviceScanActivity extends AppCompatActivity {
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         searchDevices = (Button) findViewById(R.id.searchDevicesButton);
 
@@ -69,9 +72,13 @@ public class DeviceScanActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!bluetoothAdapter.isEnabled()) {
                     Toast.makeText(DeviceScanActivity.this, "Bluetooth ist deaktiviert", Toast.LENGTH_SHORT).show();
-                } else {
-                    scanLeDevice();
+                    return;
                 }
+                if (!locationManager.isLocationEnabled()) {
+                    Toast.makeText(DeviceScanActivity.this, "Standort ist deaktiviert", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                scanLeDevice();
             }
         });
 
