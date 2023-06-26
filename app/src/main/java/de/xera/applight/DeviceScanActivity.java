@@ -7,13 +7,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -33,7 +38,8 @@ public class DeviceScanActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
     private LocationManager locationManager;
-    private static final long SCAN_PERIOD = 10000;
+    private BluetoothGatt bluetoothGatt;
+    private static final long SCAN_PERIOD = 3000;
     String[] permissions;
 
     private Button searchDevices;
@@ -132,6 +138,23 @@ public class DeviceScanActivity extends AppCompatActivity {
             };
 
 
+    @SuppressLint("MissingPermission")
     public void connectDevice(BluetoothDevice bluetoothDevice) {
+        bluetoothGatt = bluetoothDevice.connectGatt(this, false, bluetoothGattCallback);
     }
+
+    private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                Log.d("ConnectionState", "Connected");
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
+                //Toast.makeText(DeviceScanActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.d("ConnectionState", "Disconnected");
+            }
+        }
+    };
+
 }
