@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -29,7 +30,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.UUID;
 
+@SuppressLint("MissingPermission")
 public class DeviceScanActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -38,8 +41,8 @@ public class DeviceScanActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
     private LocationManager locationManager;
-    private BluetoothGatt bluetoothGatt;
     private static final long SCAN_PERIOD = 3000;
+
     String[] permissions;
 
     private Button searchDevices;
@@ -104,7 +107,6 @@ public class DeviceScanActivity extends AppCompatActivity {
     private boolean scanning = false;
     private Handler handler = new Handler();
 
-
     private void scanLeDevice() {
         if (!scanning) {
             // Stops scanning after a predefined scan period.
@@ -138,23 +140,9 @@ public class DeviceScanActivity extends AppCompatActivity {
             };
 
 
-    @SuppressLint("MissingPermission")
     public void connectDevice(BluetoothDevice bluetoothDevice) {
-        bluetoothGatt = bluetoothDevice.connectGatt(this, false, bluetoothGattCallback);
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+        intent.putExtra("device", bluetoothDevice);
+        startActivity(intent);
     }
-
-    private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d("ConnectionState", "Connected");
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                startActivity(intent);
-                //Toast.makeText(DeviceScanActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d("ConnectionState", "Disconnected");
-            }
-        }
-    };
-
 }
