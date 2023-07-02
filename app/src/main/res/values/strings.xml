@@ -15,7 +15,7 @@
     <string name="timer_volume">Lautstärke</string>
     <!-- Strings used for Chips -->
     <string name="weekday_mo">Mo</string>
-    <string name="weekday_di">Do</string>
+    <string name="weekday_di">Di</string>
     <string name="weekday_mi">Mi</string>
     <string name="weekday_do">Do</string>
     <string name="weekday_fr">Fr</string>

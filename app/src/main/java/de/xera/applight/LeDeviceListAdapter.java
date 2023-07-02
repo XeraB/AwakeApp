@@ -57,10 +57,14 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     }
 
     public void addDevice(BluetoothDevice device) {
-        // Check if Device already exists
-        if(!localDataSet.contains(device) || device.getName() != "null") {
-            localDataSet.add(device);
-            notifyDataSetChanged();
+        //Check if device is not empty or if it already exists in the list
+        if (device.getName() == null) {
+            return;
         }
+        if (localDataSet.contains(device)) {
+            return;
+        }
+        localDataSet.add(device);
+        notifyDataSetChanged();
     }
 }

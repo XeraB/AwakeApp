@@ -42,6 +42,8 @@ public class HomeActivity extends AppCompatActivity {
 
     BluetoothDevice device;
     private Button setTimer;
+    private Button startAlarm;
+    private Button stopAlarm;
     private Button sendForm;
     private TextView time;
     private TextView duration;
@@ -51,6 +53,7 @@ public class HomeActivity extends AppCompatActivity {
     final UUID TIME_CHAR = UUID.fromString("b7d06720-3cb7-40dc-94da-61b4af8a2759");
     final UUID DURATION_CHAR = UUID.fromString("f246785d-5c35-4e77-be65-81d711fff24a");
     final UUID VOLUME_CHAR = UUID.fromString("eaefd17d-24cf-4021-afb7-06c7d9f221f9");
+    final UUID ALARM_CHAR = UUID.fromString("33611222-e286-4835-b760-4adbcad8770b");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         setTimer = findViewById(R.id.button_new_timer);
+        startAlarm = findViewById(R.id.button_start_alarm);
+        stopAlarm = findViewById(R.id.button_stop_alarm);
 
         device = (BluetoothDevice) getIntent().getExtras().get("device");
         gatt = device.connectGatt(this, false, bluetoothGattCallback);
@@ -78,6 +83,19 @@ public class HomeActivity extends AppCompatActivity {
                         setContentView(R.layout.activity_home);
                     }
                 });
+            }
+        });
+
+        startAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendAlarmValue(1);
+            }
+        });
+        stopAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendAlarmValue(0);
             }
         });
     }
@@ -102,17 +120,9 @@ public class HomeActivity extends AppCompatActivity {
         BigInteger bigInt = BigInteger.valueOf(Integer.parseInt(volume.getText().toString()));
         byte[] volumeArray = bigInt.toByteArray();
 
-        Log.d("Form", "Time: " + bigIntTime);
-        Log.d("Form", "Duration: " + bigIntDuration);
-        Log.d("Form", "Volume: " + Arrays.toString(volumeArray));
-
         timeCharacteristic.setValue(timeArray);
         durationCharacteristic.setValue(durationArray);
         volumeCharacteristic.setValue(volumeArray);
-
-        Log.d("Form", "Time: " + Arrays.toString(timeCharacteristic.getValue()));
-        Log.d("Form", "Duration: " + Arrays.toString(durationCharacteristic.getValue()));
-        Log.d("Form", "Volume: " + Arrays.toString(volumeCharacteristic.getValue()));
 
         Boolean status = gatt.writeCharacteristic(timeCharacteristic);
         Log.d("Gatt", String.valueOf(status));
@@ -131,6 +141,17 @@ public class HomeActivity extends AppCompatActivity {
         status = gatt.writeCharacteristic(volumeCharacteristic);
         Log.d("Gatt", String.valueOf(status));
         Log.d("Form", "Form sent");
+    }
+
+    private void sendAlarmValue(int value) {
+        BluetoothGattCharacteristic alarmCharacteristic = service.getCharacteristic(ALARM_CHAR);
+
+        BigInteger bigInt = BigInteger.valueOf(value);
+        byte[] alarmArray = bigInt.toByteArray();
+
+        alarmCharacteristic.setValue(alarmArray);
+        Boolean status = gatt.writeCharacteristic(alarmCharacteristic);
+        Log.d("Gatt", String.valueOf(status));
     }
 
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
