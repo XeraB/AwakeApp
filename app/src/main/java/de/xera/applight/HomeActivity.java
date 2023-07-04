@@ -1,38 +1,26 @@
 package de.xera.applight;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.UnsupportedEncodingException;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.UUID;
-
-import de.xera.applight.databinding.ActivityHomeBinding;
 
 @SuppressLint("MissingPermission")
 public class HomeActivity extends AppCompatActivity {
@@ -44,6 +32,8 @@ public class HomeActivity extends AppCompatActivity {
     private Button setTimer;
     private Button startAlarm;
     private Button stopAlarm;
+    private SwitchMaterial nightLight;
+    private ChipGroup timerChipGroup;
     private Button sendForm;
     private TextView time;
     private TextView duration;
@@ -54,6 +44,8 @@ public class HomeActivity extends AppCompatActivity {
     final UUID DURATION_CHAR = UUID.fromString("f246785d-5c35-4e77-be65-81d711fff24a");
     final UUID VOLUME_CHAR = UUID.fromString("eaefd17d-24cf-4021-afb7-06c7d9f221f9");
     final UUID ALARM_CHAR = UUID.fromString("33611222-e286-4835-b760-4adbcad8770b");
+    final UUID NIGHT_CHAR = UUID.fromString("a805442b-63a8-4f7e-8f4e-59d0dcafba98");
+    final UUID NIGHT_TIMER_CHAR = UUID.fromString("9dcdea3b-2a3c-4662-9eba-2e0bee9ffcf7");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +55,8 @@ public class HomeActivity extends AppCompatActivity {
         setTimer = findViewById(R.id.button_new_timer);
         startAlarm = findViewById(R.id.button_start_alarm);
         stopAlarm = findViewById(R.id.button_stop_alarm);
+        nightLight = findViewById(R.id.switch_night_light);
+        timerChipGroup = findViewById(R.id.chip_group_timer);
 
         device = (BluetoothDevice) getIntent().getExtras().get("device");
         gatt = device.connectGatt(this, false, bluetoothGattCallback);
@@ -98,6 +92,34 @@ public class HomeActivity extends AppCompatActivity {
                 sendAlarmValue(0);
             }
         });
+        nightLight.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            Log.d("ChipGroup", "Selected: " + timerChipGroup.getCheckedChipId());
+            Chip chip = timerChipGroup.findViewById(timerChipGroup.getCheckedChipId());
+            int time;
+            switch (chip.getText().toString()) {
+                case "10 min":
+                    time = 10;
+                    break;
+                case "20 min":
+                    time = 20;
+                    break;
+                case "30 min":
+                    time = 30;
+                    break;
+                case "60 min":
+                    time = 60;
+                    break;
+                default:
+                    time = 1;
+            }
+            if (isChecked) {
+                sendNightLightValue(1, time);
+            } else {
+                sendNightLightValue(0, 0);
+            }
+
+        });
     }
 
     @Override
@@ -126,16 +148,16 @@ public class HomeActivity extends AppCompatActivity {
 
         Boolean status = gatt.writeCharacteristic(timeCharacteristic);
         Log.d("Gatt", String.valueOf(status));
-        try{
+        try {
             Thread.sleep(100);
-        } catch(InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         status = gatt.writeCharacteristic(durationCharacteristic);
         Log.d("Gatt", String.valueOf(status));
-        try{
+        try {
             Thread.sleep(100);
-        } catch(InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         status = gatt.writeCharacteristic(volumeCharacteristic);
@@ -151,6 +173,28 @@ public class HomeActivity extends AppCompatActivity {
 
         alarmCharacteristic.setValue(alarmArray);
         Boolean status = gatt.writeCharacteristic(alarmCharacteristic);
+        Log.d("Gatt", String.valueOf(status));
+    }
+
+    private void sendNightLightValue(int value, int time) {
+        BluetoothGattCharacteristic nightCharacteristic = service.getCharacteristic(NIGHT_CHAR);
+        BluetoothGattCharacteristic nightTimerCharacteristic = service.getCharacteristic(NIGHT_TIMER_CHAR);
+
+        BigInteger bigInt = BigInteger.valueOf(value);
+        byte[] valueArray = bigInt.toByteArray();
+        BigInteger bigInt2 = BigInteger.valueOf(time);
+        byte[] timeArray = bigInt2.toByteArray();
+
+        nightCharacteristic.setValue(valueArray);
+        nightTimerCharacteristic.setValue(timeArray);
+        Boolean status = gatt.writeCharacteristic(nightTimerCharacteristic);
+        Log.d("Gatt", String.valueOf(status));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        status = gatt.writeCharacteristic(nightCharacteristic);
         Log.d("Gatt", String.valueOf(status));
     }
 
@@ -171,7 +215,7 @@ public class HomeActivity extends AppCompatActivity {
             super.onServicesDiscovered(gatt, status);
 
             service = gatt.getService(TIMER_SERVICE);
-            if ( service != null) {
+            if (service != null) {
                 Log.d("BLEService", "Timer service found.");
                 Log.d("Characteristics", service.getCharacteristics().toString());
 

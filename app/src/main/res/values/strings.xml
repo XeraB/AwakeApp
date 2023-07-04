@@ -1,19 +1,26 @@
 <resources>
     <string name="app_name">Awake</string>
-    <string name="title_activity_home">HomeActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-
+    <!-- Strings HomeActivity -->
+    <string name="button_start_alarm">Start Alarm</string>
+    <string name="button_stop_alarm">Stop Alarm</string>
+    <string name="button_new_alarm">Neue Weckzeit</string>
     <string name="night_light">Nachtlicht</string>
+    <string name="night_light_timer">Timer:</string>
+    <string name="min_10">10 min</string>
+    <string name="min_20">20 min</string>
+    <string name="min_30">30 min</string>
+    <string name="min_60">60 min</string>
 
+    <!-- Strings HomeActivity Form -->
     <string name="timer_time">Uhrzeit</string>
     <string name="timer_duration">Zeitspanne</string>
     <string name="timer_volume">Lautstärke</string>
-    <!-- Strings used for Chips -->
+    <string name="time_in_min">Zeit in Minuten</string>
+    <string name="volume_min_max">Lautstärke zwischen 15 und 25</string>
+    <string name="time_format">Uhrzeit: 00:00</string>
+    <string name="weekdays">Wochentage</string>
+    <string name="set_new_alarm">Neue Weckzeit einstellen</string>
     <string name="weekday_mo">Mo</string>
     <string name="weekday_di">Di</string>
     <string name="weekday_mi">Mi</string>
@@ -21,4 +28,9 @@
     <string name="weekday_fr">Fr</string>
     <string name="weekday_sa">Sa</string>
     <string name="weekday_so">So</string>
+    <string name="send">Absenden</string>
+
+    <!-- Strings DeviceScanActivity -->
+    <string name="search_bluetooth_device">Geräte suchen</string>
+    <string name="connect_bluetooth_device">Bluetooth Gerät verbinden</string>
 </resources>

@@ -1,20 +1,10 @@
 package de.xera.applight;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -29,8 +19,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.Arrays;
-import java.util.UUID;
 
 @SuppressLint("MissingPermission")
 public class DeviceScanActivity extends AppCompatActivity {
@@ -74,7 +69,7 @@ public class DeviceScanActivity extends AppCompatActivity {
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        searchDevices = (Button) findViewById(R.id.searchDevicesButton);
+        searchDevices = findViewById(R.id.searchDevicesButton);
 
         searchDevices.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +100,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     }
 
     private boolean scanning = false;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
 
     private void scanLeDevice() {
         if (!scanning) {
@@ -129,7 +124,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     }
 
     // Device scan callback.
-    private ScanCallback leScanCallback =
+    private final ScanCallback leScanCallback =
             new ScanCallback() {
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {

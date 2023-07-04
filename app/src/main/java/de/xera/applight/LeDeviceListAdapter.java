@@ -16,8 +16,8 @@ import java.util.List;
 
 public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapter.ViewHolder> {
 
-    private List<BluetoothDevice> localDataSet;
-    private Context context;
+    private final List<BluetoothDevice> localDataSet;
+    private final Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView deviceName;
@@ -25,8 +25,8 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            deviceName = (TextView)itemView.findViewById(R.id.device_name);
-            connectButton = (Button) itemView.findViewById(R.id.connectButton);
+            deviceName = itemView.findViewById(R.id.device_name);
+            connectButton = itemView.findViewById(R.id.connectButton);
         }
     }
 
