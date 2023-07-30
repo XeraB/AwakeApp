@@ -11,6 +11,7 @@
     <string name="min_20">20 min</string>
     <string name="min_30">30 min</string>
     <string name="min_60">60 min</string>
+    <string name="night_light_brightness">Helligkeit</string>
 
     <!-- Strings HomeActivity Form -->
     <string name="timer_time">Uhrzeit</string>

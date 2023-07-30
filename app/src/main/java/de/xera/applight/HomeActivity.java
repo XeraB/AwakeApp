@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.slider.Slider;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.math.BigInteger;
@@ -34,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button stopAlarm;
     private SwitchMaterial nightLight;
     private ChipGroup timerChipGroup;
+    private Slider brightness;
     private Button sendForm;
     private TextView time;
     private TextView duration;
@@ -46,6 +48,7 @@ public class HomeActivity extends AppCompatActivity {
     final UUID ALARM_CHAR = UUID.fromString("33611222-e286-4835-b760-4adbcad8770b");
     final UUID NIGHT_CHAR = UUID.fromString("a805442b-63a8-4f7e-8f4e-59d0dcafba98");
     final UUID NIGHT_TIMER_CHAR = UUID.fromString("9dcdea3b-2a3c-4662-9eba-2e0bee9ffcf7");
+    final UUID NIGHT_BRIGHT_CHAR = UUID.fromString("b34278fc-4756-45dc-b7d5-22a35412dea1");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         stopAlarm = findViewById(R.id.button_stop_alarm);
         nightLight = findViewById(R.id.switch_night_light);
         timerChipGroup = findViewById(R.id.chip_group_timer);
+        brightness = findViewById(R.id.slider_brightness);
 
         device = (BluetoothDevice) getIntent().getExtras().get("device");
         gatt = device.connectGatt(this, false, bluetoothGattCallback);
@@ -118,8 +122,11 @@ public class HomeActivity extends AppCompatActivity {
             } else {
                 sendNightLightValue(0, 0);
             }
-
         });
+        brightness.addOnChangeListener(((slider, value, fromUser) -> {
+            Log.d("Slider", "Selected: " + value);
+            sendNightLightBrightness((int) value);
+        }));
     }
 
     @Override
@@ -195,6 +202,17 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         status = gatt.writeCharacteristic(nightCharacteristic);
+        Log.d("Gatt", String.valueOf(status));
+    }
+
+    private void sendNightLightBrightness(int value) {
+        BluetoothGattCharacteristic nightBrightCharacteristic = service.getCharacteristic(NIGHT_BRIGHT_CHAR);
+
+        BigInteger bigInt = BigInteger.valueOf(value);
+        byte[] valueArray = bigInt.toByteArray();
+
+        nightBrightCharacteristic.setValue(valueArray);
+        Boolean status = gatt.writeCharacteristic(nightBrightCharacteristic);
         Log.d("Gatt", String.valueOf(status));
     }
 

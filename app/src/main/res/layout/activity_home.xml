@@ -88,13 +88,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        app:checkedChip="@+id/chip_10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:singleSelection="true"
         app:selectionRequired="true"
-        app:checkedChip="@+id/chip_10">
+        app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_10"
@@ -128,5 +128,34 @@
             android:text="@string/min_60"
             android:textSize="12sp" />
     </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/night_light_brightness"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.196"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chip_group_timer" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_brightness"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="100dp"
+        android:stepSize="1"
+        android:value="255"
+        android:valueFrom="5"
+        android:valueTo="255"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+    </com.google.android.material.slider.Slider>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
