@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,16 +49,16 @@ public class DeviceScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_device_scan);
         permissions = new String[]{Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         Log.d("OnCreate()", "Permissions check:");
-        if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Log.d("OnCreate()", "Permissions missing BLUETOOTH_CONNECT");
             ActivityCompat.requestPermissions(this, permissions, 1);
-        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+        } else if (ContextCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             Log.d("OnCreate()", "Permissions missing BLUETOOTH_SCAN");
             ActivityCompat.requestPermissions(this, permissions, 1);
-        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else if (ContextCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d("OnCreate()", "Permissions missing ACCESS_COARSE_LOCATION");
             ActivityCompat.requestPermissions(this, permissions, 1);
-        } else if (ActivityCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else if (ContextCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d("OnCreate()", "Permissions missing ACCESS_FINE_LOCATION");
             ActivityCompat.requestPermissions(this, permissions, 1);
         } else {
@@ -109,13 +110,13 @@ public class DeviceScanActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     scanning = false;
-                    Log.d("DevicesScanActivity","Scan stopped.");
+                    Log.d("DevicesScanActivity", "Scan stopped.");
                     bluetoothLeScanner.stopScan(leScanCallback);
                 }
             }, SCAN_PERIOD);
 
             scanning = true;
-            Log.d("DevicesScanActivity","Starting scan ...");
+            Log.d("DevicesScanActivity", "Starting scan ...");
             bluetoothLeScanner.startScan(leScanCallback);
         } else {
             scanning = false;
@@ -128,7 +129,7 @@ public class DeviceScanActivity extends AppCompatActivity {
             new ScanCallback() {
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
-                    Log.d("DevicesScanActivity","Device " + result.getDevice().getName());
+                    Log.d("DevicesScanActivity", "Device " + result.getDevice().getName());
                     super.onScanResult(callbackType, result);
                     adapter.addDevice(result.getDevice());
                 }

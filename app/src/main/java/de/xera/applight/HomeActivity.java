@@ -65,37 +65,20 @@ public class HomeActivity extends AppCompatActivity {
         device = (BluetoothDevice) getIntent().getExtras().get("device");
         gatt = device.connectGatt(this, false, bluetoothGattCallback);
 
-        setTimer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setContentView(R.layout.form_timer);
-                time = findViewById(R.id.alarm_time);
-                duration = findViewById(R.id.alarm_duration);
-                volume = findViewById(R.id.alarm_volume);
-                sendForm = findViewById(R.id.button_send_form);
-                sendForm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        sendFormToService();
-
-                        setContentView(R.layout.activity_home);
-                    }
-                });
-            }
+        setTimer.setOnClickListener(view -> {
+            setContentView(R.layout.form_timer);
+            time = findViewById(R.id.alarm_time);
+            duration = findViewById(R.id.alarm_duration);
+            volume = findViewById(R.id.alarm_volume);
+            sendForm = findViewById(R.id.button_send_form);
+            sendForm.setOnClickListener(view1 -> {
+                sendFormToService();
+                setContentView(R.layout.activity_home);
+            });
         });
 
-        startAlarm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendAlarmValue(1);
-            }
-        });
-        stopAlarm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendAlarmValue(0);
-            }
-        });
+        startAlarm.setOnClickListener(view -> sendAlarmValue(1));
+        stopAlarm.setOnClickListener(view -> sendAlarmValue(0));
         nightLight.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
             Log.d("ChipGroup", "Selected: " + timerChipGroup.getCheckedChipId());
@@ -221,7 +204,6 @@ public class HomeActivity extends AppCompatActivity {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d("ConnectionState", "Connected");
-                //Toast.makeText(HomeActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                 gatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("ConnectionState", "Disconnected");
@@ -236,9 +218,6 @@ public class HomeActivity extends AppCompatActivity {
             if (service != null) {
                 Log.d("BLEService", "Timer service found.");
                 Log.d("Characteristics", service.getCharacteristics().toString());
-
-                //Toast.makeText(HomeActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-
             } else {
                 Log.e("BLEService", "Could not find Timer service");
             }

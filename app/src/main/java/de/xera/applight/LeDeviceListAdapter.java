@@ -1,5 +1,6 @@
 package de.xera.applight;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressLint("MissingPermission")
 public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapter.ViewHolder> {
 
     private final List<BluetoothDevice> localDataSet;
@@ -46,9 +48,9 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     @Override
     public void onBindViewHolder(@NonNull LeDeviceListAdapter.ViewHolder holder, int position) {
         holder.deviceName.setText(localDataSet.get(position).getName());
-        holder.connectButton.setOnClickListener((button) -> {
-            ((DeviceScanActivity) context).connectDevice(localDataSet.get(position));
-        });
+        holder.connectButton.setOnClickListener(button ->
+                ((DeviceScanActivity) context).connectDevice(localDataSet.get(position))
+        );
     }
 
     @Override
