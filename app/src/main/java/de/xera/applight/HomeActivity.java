@@ -37,12 +37,14 @@ public class HomeActivity extends AppCompatActivity {
     private ChipGroup timerChipGroup;
     private Slider brightness;
     private Button sendForm;
-    private TextView time;
+    private TextView hour;
+    private TextView minute;
     private TextView duration;
     private TextView volume;
 
     final UUID TIMER_SERVICE = UUID.fromString("19B10010-E8F2-537E-4F6C-D104768A1214");
-    final UUID TIME_CHAR = UUID.fromString("b7d06720-3cb7-40dc-94da-61b4af8a2759");
+    final UUID HOUR_CHAR = UUID.fromString("b7d06720-3cb7-40dc-94da-61b4af8a2759");
+    final UUID MINUTE_CHAR = UUID.fromString("57dd48d8-ba50-4df4-ab6b-9e2349cac529");
     final UUID DURATION_CHAR = UUID.fromString("f246785d-5c35-4e77-be65-81d711fff24a");
     final UUID VOLUME_CHAR = UUID.fromString("eaefd17d-24cf-4021-afb7-06c7d9f221f9");
     final UUID ALARM_CHAR = UUID.fromString("33611222-e286-4835-b760-4adbcad8770b");
@@ -67,7 +69,8 @@ public class HomeActivity extends AppCompatActivity {
 
         setTimer.setOnClickListener(view -> {
             setContentView(R.layout.form_timer);
-            time = findViewById(R.id.alarm_time);
+            hour = findViewById(R.id.alarm_time_hour);
+            minute = findViewById(R.id.alarm_time_min);
             duration = findViewById(R.id.alarm_duration);
             volume = findViewById(R.id.alarm_volume);
             sendForm = findViewById(R.id.button_send_form);
@@ -121,22 +124,33 @@ public class HomeActivity extends AppCompatActivity {
 
     private void sendFormToService() {
         Log.d("Form", "Sending form ...");
-        BluetoothGattCharacteristic timeCharacteristic = service.getCharacteristic(TIME_CHAR);
+        BluetoothGattCharacteristic hourCharacteristic = service.getCharacteristic(HOUR_CHAR);
+        BluetoothGattCharacteristic minuteCharacteristic = service.getCharacteristic(MINUTE_CHAR);
         BluetoothGattCharacteristic durationCharacteristic = service.getCharacteristic(DURATION_CHAR);
         BluetoothGattCharacteristic volumeCharacteristic = service.getCharacteristic(VOLUME_CHAR);
 
-        BigInteger bigIntTime = BigInteger.valueOf(Integer.parseInt(time.getText().toString()));
-        byte[] timeArray = bigIntTime.toByteArray();
+        BigInteger bigIntHour = BigInteger.valueOf(Integer.parseInt(hour.getText().toString()));
+        byte[] hourArray = bigIntHour.toByteArray();
+        BigInteger bigIntMin = BigInteger.valueOf(Integer.parseInt(minute.getText().toString()));
+        byte[] minArray = bigIntMin.toByteArray();
         BigInteger bigIntDuration = BigInteger.valueOf(Integer.parseInt(duration.getText().toString()));
         byte[] durationArray = bigIntDuration.toByteArray();
         BigInteger bigInt = BigInteger.valueOf(Integer.parseInt(volume.getText().toString()));
         byte[] volumeArray = bigInt.toByteArray();
 
-        timeCharacteristic.setValue(timeArray);
+        hourCharacteristic.setValue(hourArray);
+        minuteCharacteristic.setValue(minArray);
         durationCharacteristic.setValue(durationArray);
         volumeCharacteristic.setValue(volumeArray);
 
-        Boolean status = gatt.writeCharacteristic(timeCharacteristic);
+        Boolean status = gatt.writeCharacteristic(hourCharacteristic);
+        Log.d("Gatt", String.valueOf(status));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        status = gatt.writeCharacteristic(minuteCharacteristic);
         Log.d("Gatt", String.valueOf(status));
         try {
             Thread.sleep(100);
@@ -207,6 +221,7 @@ public class HomeActivity extends AppCompatActivity {
                 gatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("ConnectionState", "Disconnected");
+                finish();
             }
         }
 

@@ -14,12 +14,13 @@
     <string name="night_light_brightness">Helligkeit</string>
 
     <!-- Strings HomeActivity Form -->
-    <string name="timer_time">Uhrzeit</string>
+    <string name="timer_hour">Stunde</string>
+    <string name="timer_min">Minute</string>
     <string name="timer_duration">Zeitspanne</string>
     <string name="timer_volume">Lautstärke</string>
     <string name="time_in_min">Zeit in Minuten</string>
     <string name="volume_min_max">Lautstärke zwischen 15 und 25</string>
-    <string name="time_format">Uhrzeit: 00:00</string>
+    <string name="time">Uhrzeit</string>
     <string name="weekdays">Wochentage</string>
     <string name="set_new_alarm">Neue Weckzeit einstellen</string>
     <string name="weekday_mo">Mo</string>

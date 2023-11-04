@@ -54,15 +54,19 @@ public class DeviceScanActivity extends AppCompatActivity {
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
+        /*
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         String lastDeviceAddress = sharedPref.getString(LAST_BLE_DEVICE_ADDRESS, "none");
         if(!lastDeviceAddress.equals("none")) {
             BluetoothDevice lastBluetoothDevice = bluetoothAdapter.getRemoteDevice(lastDeviceAddress);
 
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-            intent.putExtra("device", lastBluetoothDevice);
-            startActivity(intent);
+            if(lastBluetoothDevice != null) {
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("device", lastBluetoothDevice);
+                startActivity(intent);
+            }
         }
+         */
         setContentView(R.layout.activity_device_scan);
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -113,15 +117,21 @@ public class DeviceScanActivity extends AppCompatActivity {
                 public void onScanResult(int callbackType, ScanResult result) {
                     Log.d("DevicesScanActivity", "Device " + result.getDevice().getName());
                     super.onScanResult(callbackType, result);
-                    adapter.addDevice(result.getDevice());
+                    if (result.getDevice().getName() != null) {
+                        if(result.getDevice().getName().contains("AWAKE")) {
+                            adapter.addDevice(result.getDevice());
+                        }
+                    }
                 }
             };
 
 
     public void connectDevice(BluetoothDevice bluetoothDevice) {
+        /*
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(LAST_BLE_DEVICE_ADDRESS, bluetoothDevice.getName());
         editor.apply();
+         */
 
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.putExtra("device", bluetoothDevice);
