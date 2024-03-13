@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -42,7 +43,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     private Button searchDevices;
     SharedPreferences sharedPref;
     private boolean scanning = false;
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private static final String LAST_BLE_DEVICE_ADDRESS = "lastBleDeviceAddress";
 
@@ -54,25 +55,13 @@ public class DeviceScanActivity extends AppCompatActivity {
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
-        /*
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String lastDeviceAddress = sharedPref.getString(LAST_BLE_DEVICE_ADDRESS, "none");
-        if(!lastDeviceAddress.equals("none")) {
-            BluetoothDevice lastBluetoothDevice = bluetoothAdapter.getRemoteDevice(lastDeviceAddress);
+        connectToLastBleDevice();
 
-            if(lastBluetoothDevice != null) {
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                intent.putExtra("device", lastBluetoothDevice);
-                startActivity(intent);
-            }
-        }
-         */
         setContentView(R.layout.activity_device_scan);
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         searchDevices = findViewById(R.id.searchDevicesButton);
-
         searchDevices.setOnClickListener(view -> {
             if (!bluetoothAdapter.isEnabled()) {
                 Toast.makeText(DeviceScanActivity.this, "Bluetooth ist deaktiviert", Toast.LENGTH_SHORT).show();
@@ -90,6 +79,25 @@ public class DeviceScanActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(llm);
         adapter = new LeDeviceListAdapter(this);
         recyclerView.setAdapter(adapter);
+    }
+
+
+    private void connectToLastBleDevice() throws NullPointerException{
+        String lastDeviceAddress = sharedPref.getString(LAST_BLE_DEVICE_ADDRESS, "none");
+        Log.d("LastBLEDevice", "Device: "+ lastDeviceAddress);
+        if (!lastDeviceAddress.equals("none") && BluetoothAdapter.checkBluetoothAddress(lastDeviceAddress)) {
+            try {
+                BluetoothDevice lastBluetoothDevice = bluetoothAdapter.getRemoteDevice(lastDeviceAddress);
+                Log.d("LastBLEDevice", ""+ lastBluetoothDevice.toString());
+                if (lastBluetoothDevice != null) {
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    intent.putExtra("device", lastBluetoothDevice);
+                    startActivity(intent);
+                }
+            } catch (Exception e) {
+                Log.d("LastBLEDevice", e.toString());
+            }
+        }
     }
 
     private void scanLeDevice() {
@@ -118,7 +126,7 @@ public class DeviceScanActivity extends AppCompatActivity {
                     Log.d("DevicesScanActivity", "Device " + result.getDevice().getName());
                     super.onScanResult(callbackType, result);
                     if (result.getDevice().getName() != null) {
-                        if(result.getDevice().getName().contains("AWAKE")) {
+                        if (result.getDevice().getName().contains("AWAKE")) {
                             adapter.addDevice(result.getDevice());
                         }
                     }
@@ -127,18 +135,18 @@ public class DeviceScanActivity extends AppCompatActivity {
 
 
     public void connectDevice(BluetoothDevice bluetoothDevice) {
-        /*
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(LAST_BLE_DEVICE_ADDRESS, bluetoothDevice.getName());
-        editor.apply();
-         */
-
+        String address = bluetoothDevice.getAddress();
+        if(address != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(LAST_BLE_DEVICE_ADDRESS, address);
+            editor.apply();
+        }
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.putExtra("device", bluetoothDevice);
         startActivity(intent);
     }
 
-    private void checkForPermissions(){
+    private void checkForPermissions() {
         permissions = new String[]{Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         Log.d("OnCreate()", "Permissions check:");
         if (ContextCompat.checkSelfPermission(DeviceScanActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -157,6 +165,7 @@ public class DeviceScanActivity extends AppCompatActivity {
             Log.d("Permissions", "Permissions granted.");
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
