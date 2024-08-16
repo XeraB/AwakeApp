@@ -9,8 +9,8 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +21,7 @@ import com.google.android.material.slider.Slider;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.UUID;
 
 @SuppressLint("MissingPermission")
@@ -37,14 +38,13 @@ public class HomeActivity extends AppCompatActivity {
     private ChipGroup timerChipGroup;
     private Slider brightness;
     private Button sendForm;
-    private TextView hour;
-    private TextView minute;
     private TextView duration;
     private TextView volume;
+    private NumberPicker hourPicker;
+    private NumberPicker minPicker;
 
     final UUID TIMER_SERVICE = UUID.fromString("19B10010-E8F2-537E-4F6C-D104768A1214");
-    final UUID HOUR_CHAR = UUID.fromString("b7d06720-3cb7-40dc-94da-61b4af8a2759");
-    final UUID MINUTE_CHAR = UUID.fromString("57dd48d8-ba50-4df4-ab6b-9e2349cac529");
+    final UUID TS_CHAR = UUID.fromString("5f954252-fd83-46e2-abaf-8fafcce5f6a3");
     final UUID DURATION_CHAR = UUID.fromString("f246785d-5c35-4e77-be65-81d711fff24a");
     final UUID VOLUME_CHAR = UUID.fromString("eaefd17d-24cf-4021-afb7-06c7d9f221f9");
     final UUID ALARM_CHAR = UUID.fromString("33611222-e286-4835-b760-4adbcad8770b");
@@ -69,8 +69,17 @@ public class HomeActivity extends AppCompatActivity {
 
         setTimer.setOnClickListener(view -> {
             setContentView(R.layout.form_timer);
-            hour = findViewById(R.id.alarm_time_hour);
-            minute = findViewById(R.id.alarm_time_min);
+            hourPicker = findViewById(R.id.picker_hour);
+            hourPicker.setMinValue(0);
+            hourPicker.setMaxValue(23);
+            hourPicker.setValue(6);
+            hourPicker.setTextSize(90);
+            hourPicker.setFormatter(i -> String.format("%02d", i));
+            minPicker = findViewById(R.id.picker_minute);
+            minPicker.setMinValue(0);
+            minPicker.setMaxValue(59);
+            minPicker.setTextSize(90);
+            minPicker.setFormatter(i -> String.format("%02d", i));
             duration = findViewById(R.id.alarm_duration);
             volume = findViewById(R.id.alarm_volume);
             sendForm = findViewById(R.id.button_send_form);
@@ -124,48 +133,68 @@ public class HomeActivity extends AppCompatActivity {
 
     private void sendFormToService() {
         Log.d("Form", "Sending form ...");
-        BluetoothGattCharacteristic hourCharacteristic = service.getCharacteristic(HOUR_CHAR);
-        BluetoothGattCharacteristic minuteCharacteristic = service.getCharacteristic(MINUTE_CHAR);
         BluetoothGattCharacteristic durationCharacteristic = service.getCharacteristic(DURATION_CHAR);
         BluetoothGattCharacteristic volumeCharacteristic = service.getCharacteristic(VOLUME_CHAR);
+        BluetoothGattCharacteristic tsCharacteristic = service.getCharacteristic(TS_CHAR);
 
-        BigInteger bigIntHour = BigInteger.valueOf(Integer.parseInt(hour.getText().toString()));
-        byte[] hourArray = bigIntHour.toByteArray();
-        BigInteger bigIntMin = BigInteger.valueOf(Integer.parseInt(minute.getText().toString()));
-        byte[] minArray = bigIntMin.toByteArray();
+        BigInteger bigIntHour = BigInteger.valueOf(hourPicker.getValue());
+        BigInteger bigIntMin = BigInteger.valueOf(minPicker.getValue());
         BigInteger bigIntDuration = BigInteger.valueOf(Integer.parseInt(duration.getText().toString()));
         byte[] durationArray = bigIntDuration.toByteArray();
         BigInteger bigInt = BigInteger.valueOf(Integer.parseInt(volume.getText().toString()));
         byte[] volumeArray = bigInt.toByteArray();
 
-        hourCharacteristic.setValue(hourArray);
-        minuteCharacteristic.setValue(minArray);
+        Calendar rightNow = Calendar.getInstance();
+        Log.d("Form", "Actual Time: " + rightNow.getTime());
+        Calendar alarm = (Calendar) rightNow.clone();
+        alarm.set(Calendar.HOUR_OF_DAY, bigIntHour.intValue());
+        alarm.set(Calendar.MINUTE, bigIntMin.intValue());
+        Log.d("Form", "Clone Time: " + alarm.getTime());
+        // Liegt der Alarm vor der Aktuellen Zeit, wird der Alarm für den nächsten Tag gesetzt.
+        if (alarm.before(rightNow)) {
+            // Add One Day
+            alarm.add(Calendar.DAY_OF_MONTH, 1);
+            Log.d("Adjust", "Alarm Time: " + alarm.getTime().toString());
+        }
+        Log.d("Form", "Alarm Time Millis: " + alarm.getTimeInMillis());
+        long ts = alarm.getTimeInMillis() / 1000;
+        Log.d("Form", "Alarm Time Seconds: " + ts);
+
+        BigInteger bigIntTs = BigInteger.valueOf((int) ts);
+        Log.d("Form", "Alarm Time Int: " + bigIntTs);
+        byte[] tsArray = bigIntTs.toByteArray();
+
+        byte[] back = new byte[4];
+        back[0] = tsArray[3];
+        back[1] = tsArray[2];
+        back[2] = tsArray[1];
+        back[3] = tsArray[0];
+
         durationCharacteristic.setValue(durationArray);
         volumeCharacteristic.setValue(volumeArray);
+        tsCharacteristic.setValue(back);
 
-        Boolean status = gatt.writeCharacteristic(hourCharacteristic);
-        Log.d("Gatt", String.valueOf(status));
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        status = gatt.writeCharacteristic(minuteCharacteristic);
-        Log.d("Gatt", String.valueOf(status));
+        Boolean status = gatt.writeCharacteristic(tsCharacteristic);
+        Log.d("Gatt", "Status ts " + String.valueOf(status));
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         status = gatt.writeCharacteristic(durationCharacteristic);
-        Log.d("Gatt", String.valueOf(status));
+        Log.d("Gatt", "Status duration " + String.valueOf(status));
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         status = gatt.writeCharacteristic(volumeCharacteristic);
-        Log.d("Gatt", String.valueOf(status));
+        Log.d("Gatt", "Status volume " + String.valueOf(status));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Log.d("Form", "Form sent");
     }
 
