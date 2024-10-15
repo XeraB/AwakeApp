@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
@@ -42,6 +43,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView volume;
     private NumberPicker hourPicker;
     private NumberPicker minPicker;
+    private TextView timerNow;
 
     final UUID TIMER_SERVICE = UUID.fromString("19B10010-E8F2-537E-4F6C-D104768A1214");
     final UUID TS_CHAR = UUID.fromString("5f954252-fd83-46e2-abaf-8fafcce5f6a3");
@@ -63,6 +65,7 @@ public class HomeActivity extends AppCompatActivity {
         nightLight = findViewById(R.id.switch_night_light);
         timerChipGroup = findViewById(R.id.chip_group_timer);
         brightness = findViewById(R.id.slider_brightness);
+        timerNow = findViewById(R.id.timerNow);
 
         device = (BluetoothDevice) getIntent().getExtras().get("device");
         gatt = device.connectGatt(this, false, bluetoothGattCallback);
@@ -262,8 +265,51 @@ public class HomeActivity extends AppCompatActivity {
             if (service != null) {
                 Log.d("BLEService", "Timer service found.");
                 Log.d("Characteristics", service.getCharacteristics().toString());
+                BluetoothGattCharacteristic tsCharacteristic = service.getCharacteristic(TS_CHAR);
+                if (tsCharacteristic != null) {
+                    gatt.readCharacteristic(tsCharacteristic);
+                }
+                BluetoothGattCharacteristic nightCharacteristic = service.getCharacteristic(NIGHT_CHAR);
+                if (nightCharacteristic != null) {
+                    gatt.readCharacteristic(nightCharacteristic);
+                }
             } else {
                 Log.e("BLEService", "Could not find Timer service");
+            }
+        }
+
+        @Override
+        public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
+            if (characteristic.getUuid().equals(NIGHT_CHAR)) {
+                switch (status) {
+                    case BluetoothGatt.GATT_SUCCESS:
+                        Log.d("Read Characteristic", "Read successful for Characteristic: " + characteristic.getUuid());
+                        Log.d("Read Characteristic", "Value " + value[0]);
+                        if (value[0] == 1) {
+                            Log.d("Read Characteristic", "Switch");
+                            runOnUiThread(() -> nightLight.setChecked(true));
+                        }
+                        break;
+                    default:
+                        Log.e("Read Characteristic", "Read failed for Characteristic: " + characteristic.getUuid());
+                }
+            } else if (characteristic.getUuid().equals(TS_CHAR)) {
+                switch (status) {
+                    case BluetoothGatt.GATT_SUCCESS:
+                        Log.d("Read Characteristic", "Read successful for Characteristic: " + characteristic.getUuid());
+                        byte[] test = {value[3], value[2], value[1], value[0]};
+                        BigInteger intTS = new BigInteger(test);
+                        Calendar rightNow = Calendar.getInstance();
+                        Calendar alarmTime = (Calendar) rightNow.clone();
+                        alarmTime.setTimeInMillis(intTS.longValue() * 1000);
+                        Log.d("Read Characteristic", "Alarm Time: " + alarmTime.getTime());
+                        runOnUiThread(() -> timerNow.setText(alarmTime.getTime().toString()));
+                        break;
+                    default:
+                        Log.e("Read Characteristic", "Read failed for Characteristic: " + characteristic.getUuid());
+                }
+            } else {
+                super.onCharacteristicRead(gatt, characteristic, value, status);
             }
         }
     };
