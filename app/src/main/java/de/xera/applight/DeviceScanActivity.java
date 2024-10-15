@@ -82,13 +82,13 @@ public class DeviceScanActivity extends AppCompatActivity {
     }
 
 
-    private void connectToLastBleDevice() throws NullPointerException{
+    private void connectToLastBleDevice() throws NullPointerException {
         String lastDeviceAddress = sharedPref.getString(LAST_BLE_DEVICE_ADDRESS, "none");
-        Log.d("LastBLEDevice", "Device: "+ lastDeviceAddress);
+        Log.d("LastBLEDevice", "Device: " + lastDeviceAddress);
         if (!lastDeviceAddress.equals("none") && BluetoothAdapter.checkBluetoothAddress(lastDeviceAddress)) {
             try {
                 BluetoothDevice lastBluetoothDevice = bluetoothAdapter.getRemoteDevice(lastDeviceAddress);
-                Log.d("LastBLEDevice", ""+ lastBluetoothDevice.toString());
+                Log.d("LastBLEDevice", "" + lastBluetoothDevice.toString());
                 if (lastBluetoothDevice != null) {
                     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                     intent.putExtra("device", lastBluetoothDevice);
@@ -119,24 +119,27 @@ public class DeviceScanActivity extends AppCompatActivity {
     }
 
     // Device scan callback.
-    private final ScanCallback leScanCallback =
-            new ScanCallback() {
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                    Log.d("DevicesScanActivity", "Device " + result.getDevice().getName());
-                    super.onScanResult(callbackType, result);
-                    if (result.getDevice().getName() != null) {
-                        if (result.getDevice().getName().contains("AWAKE")) {
-                            adapter.addDevice(result.getDevice());
-                        }
-                    }
+    private final ScanCallback leScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.d("DevicesScanActivity", "Device " + result.getDevice().getName());
+            super.onScanResult(callbackType, result);
+            if (result.getDevice().getName() != null) {
+                if (result.getDevice().getName().contains("AWAKE")) {
+                    adapter.addDevice(result.getDevice());
                 }
-            };
+            }
+        }
+    };
 
 
     public void connectDevice(BluetoothDevice bluetoothDevice) {
+        if (scanning) {
+            scanning = false;
+            bluetoothLeScanner.stopScan(leScanCallback);
+        }
         String address = bluetoothDevice.getAddress();
-        if(address != null) {
+        if (address != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(LAST_BLE_DEVICE_ADDRESS, address);
             editor.apply();
