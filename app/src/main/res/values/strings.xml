@@ -4,35 +4,36 @@
     <!-- Strings HomeActivity -->
     <string name="button_start_alarm">Start Alarm</string>
     <string name="button_stop_alarm">Stop Alarm</string>
-    <string name="button_new_alarm">Neue Weckzeit</string>
-    <string name="night_light">Nachtlicht</string>
+    <string name="button_new_alarm">New Alarm</string>
+    <string name="night_light">Nightlight</string>
     <string name="night_light_timer">Timer:</string>
     <string name="min_10">10 min</string>
     <string name="min_20">20 min</string>
     <string name="min_30">30 min</string>
     <string name="min_60">60 min</string>
-    <string name="night_light_brightness">Helligkeit</string>
+    <string name="night_light_brightness">Brightness:</string>
 
     <!-- Strings HomeActivity Form -->
-    <string name="timer_hour">Stunde</string>
+    <string name="timer_hour">Hour</string>
     <string name="timer_min">Minute</string>
-    <string name="timer_duration">Zeitspanne</string>
-    <string name="timer_volume">Lautstärke</string>
-    <string name="time_in_min">Zeit in Minuten</string>
-    <string name="volume_min_max">Lautstärke zwischen 15 und 25</string>
-    <string name="time">Uhrzeit</string>
-    <string name="weekdays">Wochentage</string>
-    <string name="set_new_alarm">Neue Weckzeit einstellen</string>
+    <string name="timer_duration">Timespan</string>
+    <string name="timer_volume">Volume</string>
+    <string name="time_in_min">Time in minutes</string>
+    <string name="volume_min_max">Volume between 15 and 25</string>
+    <string name="time">Time</string>
+    <string name="weekdays">Weekdays</string>
+    <string name="set_new_alarm">Set new Alarm</string>
     <string name="weekday_mo">Mo</string>
-    <string name="weekday_di">Di</string>
-    <string name="weekday_mi">Mi</string>
-    <string name="weekday_do">Do</string>
+    <string name="weekday_di">Tue</string>
+    <string name="weekday_mi">Wed</string>
+    <string name="weekday_do">Th</string>
     <string name="weekday_fr">Fr</string>
     <string name="weekday_sa">Sa</string>
-    <string name="weekday_so">So</string>
-    <string name="send">Absenden</string>
+    <string name="weekday_so">Sun</string>
+    <string name="send">Send</string>
 
     <!-- Strings DeviceScanActivity -->
-    <string name="search_bluetooth_device">Geräte suchen</string>
-    <string name="connect_bluetooth_device">Bluetooth Gerät verbinden</string>
+    <string name="search_bluetooth_device">Search for devices</string>
+    <string name="connect_bluetooth_device">Connect to device</string>
+    <string name="connect_device">Connect</string>
 </resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Awake</string>
+    <string name="button_start_alarm">Start Alarm</string>
+    <string name="button_stop_alarm">Stop Alarm</string>
+    <string name="button_new_alarm">Neue Weckzeit</string>
+    <string name="night_light">Nachtlicht</string>
+    <string name="night_light_timer">Timer:</string>
+    <string name="min_10">10 min</string>
+    <string name="min_20">20 min</string>
+    <string name="min_30">30 min</string>
+    <string name="min_60">60 min</string>
+    <string name="night_light_brightness">Helligkeit:</string>
+    <string name="timer_hour">Stunde</string>
+    <string name="timer_min">Minute</string>
+    <string name="timer_duration">Zeitspanne</string>
+    <string name="timer_volume">Lautstärke</string>
+    <string name="time_in_min">Zeit in Minuten</string>
+    <string name="volume_min_max">Lautstärke zwischen 15 und 25</string>
+    <string name="time">Uhrzeit</string>
+    <string name="weekdays">Wochentage</string>
+    <string name="set_new_alarm">Neue Weckzeit einstellen</string>
+    <string name="weekday_mo">Mo</string>
+    <string name="weekday_di">Di</string>
+    <string name="weekday_mi">Mi</string>
+    <string name="weekday_do">Do</string>
+    <string name="weekday_fr">Fr</string>
+    <string name="weekday_sa">Sa</string>
+    <string name="weekday_so">So</string>
+    <string name="send">Absenden</string>
+    <string name="search_bluetooth_device">Geräte suchen</string>
+    <string name="connect_bluetooth_device">Bluetooth Gerät verbinden</string>
+    <string name="connect_device">Verbinden</string>
+</resources>
